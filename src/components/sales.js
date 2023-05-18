@@ -26,7 +26,7 @@ import { Add, Close } from "@mui/icons-material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-
+import PlaceIcon from "@mui/icons-material/Place";
 //
 import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
@@ -36,11 +36,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
+import PersonPinIcon from "@mui/icons-material/PersonPin";
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-// ///////////////////
-
-//
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -179,11 +177,6 @@ const SaleComponent = () => {
   };
 
   const handleQuantityChange = (event, id, currentPrice) => {
-    // const { value } = event.target;
-    // setQuantities((prevQuantities) => ({
-    //   ...prevQuantities,
-    //   [itemId]: Number(value),
-    // }));
     const newQuantity = parseInt(event.target.value);
     const newPrice = newQuantity * currentPrice;
     setQuantities((prevQuantities) => ({
@@ -248,10 +241,12 @@ const SaleComponent = () => {
       });
   };
   const handleSelectProduct = (product) => {
-    // Xử lý khi người dùng chọn đối tượng product
-    console.log("Selected product:", product);
-    // Lưu trữ đối tượng product vào state hoặc thực hiện các xử lý khác
-    setDataSearch([...dataSearch, product]);
+    // Kiểm tra xem đối tượng đã tồn tại trong mảng dataSearch chưa
+    const isExisting = dataSearch.some((item) => item.id === product.id);
+    if (!isExisting) {
+      // Xử lý khi người dùng chọn đối tượng product
+      setDataSearch([...dataSearch, product]);
+    }
   };
   const calculateTotalAmount = (list) => {
     let sum = 0;
@@ -263,11 +258,11 @@ const SaleComponent = () => {
   // ==========================================================
   const handlePay = () => {
     // Xử lý sự kiện thanh toán đơn hàng
-    const list_quantity = dataSearch.map(item => ({
+    const list_quantity = dataSearch.map((item) => ({
       id_quantity: item.id,
       bill_quantity: 1,
     }));
-    console.log('Nút được nhấp vào');
+    console.log("Nút được nhấp vào");
     const billDto = {
       statusshipping: "Đơn không đăng nhập",
       transportFee: 123456,
@@ -286,12 +281,18 @@ const SaleComponent = () => {
     axios
       .post(`http://localhost:8080/api/bill/creat`, billDto, configToken)
       .then((response) => {
-        console.log(response.data);
+        alert("Thanh toán thành công");
+        window.location.href = "/sales";
       })
       .catch((error) => {
         console.log(error);
       });
   };
+  // Xóa Session khi người dùng click vào nút
+  function clearSession() {
+    sessionStorage.clear();
+    window.location.href = "/#/login";
+  }
   return (
     <div>
       <hr />
@@ -301,41 +302,13 @@ const SaleComponent = () => {
             backgroundColor: "#f7f7f8",
           }}
         >
-          <Autocomplete
-            multiple
-            id="checkboxes-tags-demo"
-            options={listProduct}
-            disableCloseOnSelect
-            getOptionLabel={(option) => `${option.id}`}
-            renderOption={(props, option, { selected }) => (
-              <li {...props}>
-                <Checkbox
-                  icon={icon}
-                  checkedIcon={checkedIcon}
-                  style={{ marginRight: 8 }}
-                  checked={selected}
-                  value={option.id}
-                  // key={option.id}
-                  onChange={handleCheckboxChange}
-                />
-                <img loading="lazy" width="20" src={option.image} />
-                {/* {option.id} */}
-                {option.name}
-              </li>
-            )}
-            style={{ width: 500 }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Mã sản phẩm"
-                placeholder="Favorites"
-              />
-            )}
-          />
-          {/* dialog */}
           <div>
-            <Button variant="outlined" onClick={handleClickOpen}>
-              Open dialog
+            <Button
+              variant="contained"
+              onClick={handleClickOpen}
+              style={{ marginBottom: "10px",marginTop: "10px", marginLeft: "20px" }}
+            >
+              Chọn sản phẩm
             </Button>
             <BootstrapDialog
               onClose={handleClose}
@@ -346,9 +319,10 @@ const SaleComponent = () => {
                 id="customized-dialog-title"
                 onClose={handleClose}
               >
-                Modal title
                 <FormControl variant="standard">
-                  <InputLabel htmlFor="component-helper">Name</InputLabel>
+                  <InputLabel htmlFor="component-helper">
+                    Nhập mã sản phẩm
+                  </InputLabel>
                   <Input
                     id="component-helper"
                     aria-describedby="component-helper-text"
@@ -405,6 +379,25 @@ const SaleComponent = () => {
                 </Button>
               </DialogActions>
             </BootstrapDialog>
+            {/* -------------------------------------------------- */}
+            <div
+              style={{
+                position: "fixed",
+                top: 20,
+                right: 10,
+                padding: "10px",
+              }}
+            >
+              <PlaceIcon
+               />
+              Chi nhánh mặc định
+              <PersonPinIcon />
+              {sessionStorage.getItem("username").replace(/"/g, "")}
+              <Button variant="outlined" onClick={clearSession}
+              style={{marginLeft: "10px" }}>
+                Đăng xuất
+              </Button>
+            </div>
           </div>
           <div
             className="col-md-2"
@@ -498,7 +491,7 @@ const SaleComponent = () => {
                         <AccountCircle sx={{ color: "action.active" }} />
                         <TextField
                           id="input-with-sx"
-                          label="Thêm khách hàng vào đơn hàng"
+                          label="Nhập SĐT khách hàng"
                           variant="standard"
                           value={sdt}
                           onChange={findSdt}

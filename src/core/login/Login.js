@@ -1,5 +1,5 @@
-import React from 'react'
-import axios from 'axios'
+import React, { useEffect } from "react";
+import axios from "axios";
 import "./index.css";
 
 import {
@@ -8,87 +8,122 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
-import { useState } from 'react'
-import { setUserSession,setPassSession } from '../common/Common'
+} from "@coreui/react";
+import CIcon from "@coreui/icons-react";
+import { cilLockLocked, cilUser } from "@coreui/icons";
+import { useState } from "react";
+import { setUserSession, setPassSession } from "../common/Common";
+// -----------------
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
 
+const Login = () => {
+  const [id, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
+  const [passWord, setPassword] = useState("");
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-export default function Login() {
-  const [id, setUserId] = useState('')
-  const [userName, setUserName] = useState('')
-  const [passWord, setPassword] = useState('')
-  const [error, setError] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-
+  useEffect(() => {}, []);
   const handleLogin = () => {
     setError(null);
     setLoading(true);
+    const user = {
+      username: userName,
+      password: passWord,
+    };
     axios
-      .post(`http://localhost:8080/api/auth/login`, { username: userName, password: passWord }).then(response => {
-        setLoading(false);
-        setUserSession(response.data.data.id,passWord,response.data.data.token, response.data.data.username)
-        window.location.href = "/sales"
-        alert("Logged in successfully")
-      }).catch(error => {
+      .post(`http://localhost:8080/api/auth/login`, user)
+      .then((response) => {
+        if (
+          response.data.data.roles.toString() === "ROLE_ADMIN" || response.data.data.roles === "ROLE_STAFF"
+        ) {
+          setLoading(false);
+          setUserSession(
+            response.data.data.id,
+            passWord,
+            response.data.data.token,
+            response.data.data.username
+          );
+          window.location.href = "/sales";
+          alert("Đăng nhập thành công");
+        } else {
+          alert("Bạn không có quyền");
+        }
+      })
+      .catch((error) => {
         setLoading(false);
         alert("Account password is incorrect");
       });
-  }
+  };
   return (
-      <div className="container h-100">
-        <div className="d-flex justify-content-center h-100">
-          <div className="user_card">
-            <div className="d-flex justify-content-center">
-            </div>
-            <CForm>
-              <div className="tileLogin">
-                <h1>Login</h1>
-                <p className="text-medium-emphasis">Sign In to your account</p>
-                <div className="input-group mb-3">
-                  <div className="input-group-append">
-                    <CInputGroup >
-                      <CInputGroupText>
-                      </CInputGroupText>
-                      <input className="form-control" type="text" name="name" placeholder="Username" autoComplete="username" value={userName} onChange={e => setUserName(e.target.value.toString())} />
-                    </CInputGroup>
-                  </div>
-                </div>
-                <div className="input-group mb-2">
-                  <div className="input-group-append">
-                    <CInputGroup className="mb-2">
-                      <CInputGroupText>
-                      </CInputGroupText>
-                      <input
-                       className="form-control"
-                       name="password"
-                        type="password"
-                        placeholder="Password"
-                        value={passWord} onChange={e => setPassword(e.target.value.toString())}
-                        autoComplete="current-password"
-                      />
-                    </CInputGroup>
-                  </div>
-                </div>
-              </div>
-              <CRow>
-                <div className="d-flex justify-content-center mt-3 login_container">
-                  {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
-                  <input type="button" className="btn btn-primary" value={loading ? 'Loading...' : 'Login'} onClick={handleLogin} disabled={loading} /><br />
-                </div>
-                <div className="d-flex justify-content-center links">
-                  <CButton color="link" className="px-0">
-                    Forgot password?
-                  </CButton>
-                </div>
-              </CRow>
-            </CForm>
-          </div>
+    <Container component="main" maxWidth="sm">
+      <Box
+        sx={{
+          boxShadow: 3,
+          borderRadius: 2,
+          px: 4,
+          py: 6,
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <h1>Login</h1>
+        <TextField
+          label="Tên đăng nhập"
+          placeholder="Username"
+          variant="standard"
+          color="warning"
+          focused
+          value={userName}
+          onChange={(e) => setUserName(e.target.value.toString())}
+          style={{ width: "100%", marginBottom: "20px", fontSize: "20px" }}
+          InputLabelProps={{
+            style: { color: "blue" },
+          }}
+          InputProps={{
+            style: { color: "black" },
+          }}
+        />
 
-        </div>
-      </div>
-  )
-
-}
+        <TextField
+          label="Mật khẩu"
+          variant="standard"
+          color="warning"
+          focused
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={passWord}
+          onChange={(e) => setPassword(e.target.value.toString())}
+          style={{ width: "100%" }}
+          InputLabelProps={{
+            style: { color: "blue" },
+          }}
+          InputProps={{
+            style: { color: "black" },
+          }}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+          onClick={handleLogin}
+        >
+          Sign In
+        </Button>
+      </Box>
+    </Container>
+  );
+};
+export default Login;
