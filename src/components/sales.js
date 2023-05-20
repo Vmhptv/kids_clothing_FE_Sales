@@ -246,6 +246,8 @@ const SaleComponent = () => {
     if (!isExisting) {
       // Xử lý khi người dùng chọn đối tượng product
       setDataSearch([...dataSearch, product]);
+    } else {
+      alert("Sản phẩm đã được chọn");
     }
   };
   const calculateTotalAmount = (list) => {
@@ -262,9 +264,14 @@ const SaleComponent = () => {
       id_quantity: item.id,
       bill_quantity: 1,
     }));
-    console.log("Nút được nhấp vào");
+    let statusshipping;
+    if (bySdt === "") {
+      statusshipping = "Đơn không đăng nhập";
+    }else{
+      statusshipping = "Đang xử lý";
+    }
     const billDto = {
-      statusshipping: "Đơn không đăng nhập",
+      statusshipping: statusshipping,
       transportFee: 123456,
       voucher_id: null,
       discount: 0,
@@ -306,7 +313,11 @@ const SaleComponent = () => {
             <Button
               variant="contained"
               onClick={handleClickOpen}
-              style={{ marginBottom: "10px",marginTop: "10px", marginLeft: "20px" }}
+              style={{
+                marginBottom: "10px",
+                marginTop: "10px",
+                marginLeft: "20px",
+              }}
             >
               Chọn sản phẩm
             </Button>
@@ -373,13 +384,7 @@ const SaleComponent = () => {
                   </TableBody>
                 </Table>
               </DialogContent>
-              <DialogActions>
-                <Button autoFocus onClick={handleClose}>
-                  Save changes
-                </Button>
-              </DialogActions>
             </BootstrapDialog>
-            {/* -------------------------------------------------- */}
             <div
               style={{
                 position: "fixed",
@@ -388,13 +393,15 @@ const SaleComponent = () => {
                 padding: "10px",
               }}
             >
-              <PlaceIcon
-               />
+              <PlaceIcon />
               Chi nhánh mặc định
               <PersonPinIcon />
               {sessionStorage.getItem("username").replace(/"/g, "")}
-              <Button variant="outlined" onClick={clearSession}
-              style={{marginLeft: "10px" }}>
+              <Button
+                variant="outlined"
+                onClick={clearSession}
+                style={{ marginLeft: "10px" }}
+              >
                 Đăng xuất
               </Button>
             </div>
