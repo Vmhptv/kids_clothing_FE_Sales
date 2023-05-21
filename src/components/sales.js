@@ -262,7 +262,9 @@ const SaleComponent = () => {
     // Xử lý sự kiện thanh toán đơn hàng
     const list_quantity = dataSearch.map((item) => ({
       id_quantity: item.id,
-      bill_quantity: quantities[item.id],
+      bill_quantity: totalQuantity ||
+      getTotal() + dataSearch.length ||
+      dataSearch.length,
     }));
     let statusshipping;
     if (bySdt === "") {
