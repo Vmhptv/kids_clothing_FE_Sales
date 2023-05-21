@@ -262,7 +262,7 @@ const SaleComponent = () => {
     // Xử lý sự kiện thanh toán đơn hàng
     const list_quantity = dataSearch.map((item) => ({
       id_quantity: item.id,
-      bill_quantity: 1,
+      bill_quantity: quantities[item.id],
     }));
     let statusshipping;
     if (bySdt === "") {
@@ -272,7 +272,7 @@ const SaleComponent = () => {
     }
     const billDto = {
       statusshipping: statusshipping,
-      transportFee: 123456,
+      transportFee: 0,
       voucher_id: null,
       discount: 0,
       downtotal: totalAmount,
