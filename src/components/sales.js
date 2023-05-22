@@ -362,7 +362,7 @@ const SaleComponent = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {listProductDetail.map((item, i) => (
+                    {listProductDetail.filter(item => item.quantity > 0).map((item, i) => (
                       <TableRow key={i}>
                         <TableCell>
                           <img
