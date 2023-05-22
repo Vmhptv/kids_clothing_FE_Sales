@@ -259,43 +259,47 @@ const SaleComponent = () => {
   };
   // ==========================================================
   const handlePay = () => {
-    // Xử lý sự kiện thanh toán đơn hàng
-    const list_quantity = dataSearch.map((item) => ({
-      id_quantity: item.id,
-      bill_quantity: totalQuantity ||
-      getTotal() + dataSearch.length ||
-      dataSearch.length,
-    }));
-    let statusshipping;
-    if (bySdt === "") {
-      statusshipping = "Đơn không đăng nhập";
-    }else{
-      statusshipping = "Đang xử lý";
+    console.log(dataSearch);
+    if (dataSearch === null || dataSearch.length === 0) {
+      alert("Chưa có sản phẩm nào để thanh toán");
+    } else if (dataSearch !== null || dataSearch.length !== 0) {
+      // Xử lý sự kiện thanh toán đơn hàng
+      const list_quantity = dataSearch.map((item) => ({
+        id_quantity: item.id,
+        bill_quantity:
+          totalQuantity || getTotal() + dataSearch.length || dataSearch.length,
+      }));
+      let statusshipping;
+      if (bySdt === "") {
+        statusshipping = "Đơn không đăng nhập";
+      } else {
+        statusshipping = "Đang xử lý";
+      }
+      const billDto = {
+        statusshipping: statusshipping,
+        transportFee: 0,
+        voucher_id: null,
+        discount: 0,
+        downtotal: totalAmount,
+        payment: 0,
+        total: totalAmount,
+        address: "Mua hàng tại quầy",
+        note: null,
+        fullname: bySdt,
+        refund: null,
+        sdt: sdt,
+        list_quantity,
+      };
+      axios
+        .post(`http://localhost:8080/api/bill/creat`, billDto, configToken)
+        .then((response) => {
+          alert("Thanh toán thành công");
+          window.location.href = "/sales";
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    const billDto = {
-      statusshipping: statusshipping,
-      transportFee: 0,
-      voucher_id: null,
-      discount: 0,
-      downtotal: totalAmount,
-      payment: 0,
-      total: totalAmount,
-      address: "Mua hàng tại quầy",
-      note: null,
-      fullname: bySdt,
-      refund: null,
-      sdt: sdt,
-      list_quantity,
-    };
-    axios
-      .post(`http://localhost:8080/api/bill/creat`, billDto, configToken)
-      .then((response) => {
-        alert("Thanh toán thành công");
-        window.location.href = "/sales";
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
   // Xóa Session khi người dùng click vào nút
   function clearSession() {
